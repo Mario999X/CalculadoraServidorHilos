@@ -15,14 +15,16 @@ fun main() {
     val servidor: Socket
     val puerto = 6969
 
-    log.debug { "Por favor, introduzca el PRIMER numero de su operacion" }
-    val num1: Int = readln().toInt()
-    log.debug { "Por favor, introduzca el SEGUNDO numero de su operacion" }
-    val num2: Int = readln().toInt()
-    log.debug { "Por favor, introduzca el TIPO de OPERACION a realizar" }
+    log.debug { "Por favor, introduzca el PRIMER numero de su operacion:" }
+    val num1 = readln().toInt()
+    log.debug { "Por favor, introduzca el SEGUNDO numero de su operacion:" }
+    val num2 = readln().toInt()
+    log.debug { "Por favor, introduzca el TIPO de OPERACION a realizar:" }
     val operador = readln()
 
     val operacion = Operacion(num1, num2, operador)
+    //println(operacion)
+    val resultado: Int
 
     try {
         direccion = InetAddress.getLocalHost()
@@ -38,11 +40,15 @@ fun main() {
         // RESPUESTA DEL SERVIDOR
 
         val respuestaOperacion = DataInputStream(servidor.getInputStream())
-        log.debug { "\t-Respuesta del servidor: $respuestaOperacion " }
+        resultado = respuestaOperacion.readInt()
+
+        log.debug { "\t-Respuesta del servidor: $resultado" }
 
         sendOperacion.close()
         respuestaOperacion.close()
         servidor.close()
+
+        log.debug { "Desconectado" }
     } catch (e: Exception) {
         e.printStackTrace()
     }
