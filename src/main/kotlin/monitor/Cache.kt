@@ -1,5 +1,6 @@
-package models
+package monitor
 
+import models.Operacion
 import mu.KotlinLogging
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
