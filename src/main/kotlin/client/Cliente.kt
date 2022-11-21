@@ -15,15 +15,18 @@ fun main() {
     val servidor: Socket
     val puerto = 6969
 
+    log.debug { "Por favor, introduzca su NOMBRE de USUARIO:" }
+    val user = readln()
     log.debug { "Por favor, introduzca el PRIMER numero de su operacion:" }
     val num1 = readln().toInt()
-    log.debug { "Por favor, introduzca el SEGUNDO numero de su operacion:" }
-    val num2 = readln().toInt()
     log.debug { "Por favor, introduzca el TIPO de OPERACION a realizar:" }
     val operador = readln()
+    log.debug { "Por favor, introduzca el SEGUNDO numero de su operacion:" }
+    val num2 = readln().toInt()
 
-    val operacion = Operacion(num1, num2, operador)
+    val operacion = Operacion(user, num1, operador, num2)
     //println(operacion)
+    val historial: String
     val resultado: Int
 
     try {
@@ -32,6 +35,11 @@ fun main() {
 
         log.debug { "Conectado al servidor" }
 
+        // Recibo el historial de operaciones del servidor
+        val receiveHistorial = DataInputStream(servidor.getInputStream())
+        historial = receiveHistorial.readUTF()
+
+        log.debug { "\t-Historial de operaciones: $historial" }
         // Envio los datos para el servdor, los que componen a "Operacion"
         val sendOperacion = ObjectOutputStream(servidor.getOutputStream())
         sendOperacion.writeObject(operacion)

@@ -1,5 +1,6 @@
 package server
 
+import models.Cache
 import models.Operacion
 import mu.KotlinLogging
 import java.io.DataOutputStream
@@ -8,16 +9,22 @@ import java.net.Socket
 
 private val log = KotlinLogging.logger { }
 
-class GestionClientes(private val s: Socket) : Runnable {
+class GestionClientes(private val s: Socket, private val c: Cache) : Runnable {
 
     private var result = 0
+    private var historial = c.get()
 
     override fun run() {
         s.setSoLinger(true, 10) // Tiempo que esta abierto el puerto
 
+        // Preparo el historial para mandarlo al cliente
+        val cacheHistorial = DataOutputStream(s.getOutputStream())
+        cacheHistorial.writeUTF(historial.toString())
+
         // Recibo los datos mandados del cliente, en este caso, un objeto Operacion
         val readerObject = ObjectInputStream(s.getInputStream())
         val op = readerObject.readObject() as Operacion
+        c.put(op)
 
         log.debug { "\tOperacion recibida: $op" }
 
@@ -33,11 +40,12 @@ class GestionClientes(private val s: Socket) : Runnable {
             0
         }
 
-        log.debug { "\tResultado: $result" }
+        log.debug { "\tResultado enviado: $result" }
 
         val dataResult = DataOutputStream(s.getOutputStream())
         dataResult.writeInt(result)
 
+        cacheHistorial.close()
         readerObject.close()
         dataResult.close()
         s.close()

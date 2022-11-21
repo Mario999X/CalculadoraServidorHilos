@@ -1,5 +1,6 @@
 package server
 
+import models.Cache
 import mu.KotlinLogging
 import java.net.ServerSocket
 import java.net.Socket
@@ -12,16 +13,18 @@ fun main() {
     var cliente: Socket
     val puerto = 6969
 
-    log.debug { "Arrancando servidor" }
+    val cache = Cache()
+
+    log.debug { "Arrancando servidor..." }
     try {
         servidor = ServerSocket(puerto)
         while (true) {
-            log.debug { "Servidor esperando..." }
+            log.debug { "\t--Servidor esperando..." }
 
             cliente = servidor.accept()
             log.debug { "Peticion de cliente -> " + cliente.inetAddress + " --- " + cliente.port }
 
-            val gc = GestionClientes(cliente)
+            val gc = GestionClientes(cliente, cache)
             gc.run()
             log.debug { "Cliente -> " + cliente.inetAddress + " --- " + cliente.port + " desconectado." }
         }
